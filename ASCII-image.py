@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
+import colorama
+from colorama import Fore
 
-img = cv2.imread('spiderman.jpg')
-cv2.imshow('spiderman',img)
-cv2.waitKey(0)
+colorama.init()
+
+img = cv2.imread('spiderman.jpeg')
 
 print(img.shape)
 
@@ -21,15 +23,21 @@ bright = np.zeros((h,w))
 for x in range(h):
     for y in range(w):
         (b,g,r) = img[x][y].astype(np.int32)
-        bright[x,y] = (b+g+r)/3 
+        bright[x,y] = 0.21*r + 0.72*g + 0.07*b
 
-# print(img)
 
 chars = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 length = len(chars)
 
+choice = input("Do you want the image in badass matrix-green color?? (y/n): ")
+
+green_text = (choice.lower() == 'y')
+
 for x in range(h):
     for y in range(w):
         val = int(bright[x,y] // 3.93)
-        print(chars[val], end="")
+        if(green_text):
+            print(Fore.GREEN +  chars[val], end="")
+        else:
+            print(chars[val], end="")
     print()
