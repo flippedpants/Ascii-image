@@ -23,8 +23,7 @@ def captureImage():
             capture.release()
             cv2.destroyAllWindows()
             
-            resized_frame = cv2.resize(frame, (500, 150))
-            h, w = resized_frame.shape[:2]
+            resized_frame = resize(frame)
             
             return resized_frame
 
@@ -34,12 +33,12 @@ def makeBrightnessMatrix(img):
     for x in range(h):
         for y in range(w):
             (b,g,r) = img[x][y].astype(np.int32)
-            bright[x,y] = (b+g+r)/3 
+            bright[x,y] = 0.114 * b + 0.587 * g + 0.299 * r
     return bright
 
 def printAscii(bright):
     chars = "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
-    h, w = bright.shape
+    h, w = bright.shape[:2]
     choice = input("Do you want the image in badass matrix-green color?? (y/n): ")
 
     green_text = (choice.lower() == 'y')
@@ -52,6 +51,25 @@ def printAscii(bright):
             else:
                 print(chars[val], end="")
         print()
+
+def resize(img):
+    h,w = img.shape[:2]
+
+    if (w<700):
+        scale_factor = 1
+    elif (w >= 700 and w <= 1400):
+        scale_factor = 0.6
+    elif (w > 1400 and w<= 2000):
+        scale_factor = 0.4
+    else:
+        scale_factor = 0.25
+
+    new_width = int(w*scale_factor)
+    aspect_ratio = h/w
+    new_height = int(aspect_ratio * new_width * 0.6)
+    resized_img = cv2.resize(img , (new_width, new_height))
+
+    return resized_img
 
 def main():
 
@@ -72,7 +90,7 @@ def main():
             img = cv2.imread(path)
             if img is None:
                 raise ValueError("Image not found or unable to load.")
-            resized_image = cv2.resize(img, (200, 150))
+            resized_image = resize(img)
             bright = makeBrightnessMatrix(resized_image)
             printAscii(bright)
         except Exception as e:
