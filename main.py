@@ -52,24 +52,50 @@ def printAscii(bright):
                 print(chars[val], end="")
         print()
 
-def resize(img):
-    h,w = img.shape[:2]
+# def resize(img):
+#     h,w = img.shape[:2]
 
-    if (w<700):
-        scale_factor = 1
-    elif (w >= 700 and w <= 1400):
-        scale_factor = 0.6
-    elif (w > 1400 and w<= 2000):
-        scale_factor = 0.4
-    else:
-        scale_factor = 0.25
+#     if (w<700):
+#         scale_factor = 1
+#     elif (w >= 700 and w <= 1400):
+#         scale_factor = 0.6
+#     elif (w > 1400 and w<= 2000):
+#         scale_factor = 0.4
+#     else:
+#         scale_factor = 0.25
 
-    new_width = int(w*scale_factor)
-    aspect_ratio = h/w
-    new_height = int(aspect_ratio * new_width * 0.6)
-    resized_img = cv2.resize(img , (new_width, new_height))
+#     new_width = int(w*scale_factor)
+#     aspect_ratio = h/w
+#     new_height = int(aspect_ratio * new_width * 0.6)
+#     resized_img = cv2.resize(img , (new_width, new_height))
 
-    return resized_img
+#     return resized_img
+
+def resize(img, term_rows=220, term_cols=940):
+    h, w = img.shape[:2]
+
+    # ASCII characters are ~1.9 times taller than wide → correction factor
+    ascii_factor = 0.55
+
+    # Terminal max dimensions
+    max_w = term_cols
+    max_h = int(term_rows / ascii_factor)
+
+    # Compute scale so image fits
+    scale_w = max_w / w
+    scale_h = max_h / h
+    scale = min(scale_w, scale_h)
+
+    # Do NOT upscale small images
+    if scale > 1:
+        scale = 1
+
+    new_w = int(w * scale)
+    new_h = int(h * scale * ascii_factor)
+
+    resized = cv2.resize(img, (new_w, new_h))
+    return resized
+
 
 def main():
 
